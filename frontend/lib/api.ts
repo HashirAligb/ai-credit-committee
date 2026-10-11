@@ -19,6 +19,7 @@ export type CalcResult = {
 };
 
 export type Agent = "financial_analyst" | "contract_analyst" | "bull" | "bear" | "chair";
+export type AgentState = { status: "waiting" | "running" | "done"; text?: string; sources?: string[] };
 export type Decision = "lend" | "dont_lend" | "lend_with_conditions";
 export type Verdict = { decision: Decision; text: string };
 

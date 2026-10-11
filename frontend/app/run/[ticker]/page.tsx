@@ -1,9 +1,9 @@
 "use client";
 import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Agent, calculate, CalcResult, Company, createRun, getCompany, Rule, streamRun, Verdict } from "../../../lib/api";
+import { Agent, AgentState, calculate, CalcResult, Company, createRun, getCompany, Rule, streamRun, Verdict } from "../../../lib/api";
 import { Button } from "../../../components/ui/button";
-import { Card } from "../../../components/ui/card";
+import { AgentSteps } from "../../../components/agent-steps";
 import { KpiCards } from "../../../components/kpi-cards";
 import { MaturityWall } from "../../../components/maturity-wall";
 import { RulesPanel } from "../../../components/rules-panel";
@@ -11,11 +11,7 @@ import { Sliders } from "../../../components/sliders";
 import { SourceDrawer } from "../../../components/source-drawer";
 import { VerdictCard } from "../../../components/verdict-card";
 
-export type AgentState = { status: "waiting" | "running" | "done"; text?: string; sources?: string[] };
 type Scenario = { drop: number; rate: number };
-
-const agents: Agent[] = ["financial_analyst", "contract_analyst", "bull", "bear", "chair"];
-const labels: Record<Agent, string> = { financial_analyst: "Financial Analyst", contract_analyst: "Contract Analyst", bull: "Bull", bear: "Bear", chair: "Committee Chair" };
 
 export default function RunPage({ params }: { params: Promise<{ ticker: string }> }) {
   const { ticker } = use(params);
@@ -83,22 +79,7 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
         <Button onClick={run} disabled={running}>{running ? "Committee in session…" : ranWith ? "Re-run committee" : "Run committee"}</Button>
       </header>
 
-      <Card>
-        <div className="grid gap-3 md:grid-cols-5">
-          {agents.map((agent) => {
-            const state = agentStates[agent] ?? { status: "waiting" };
-            return (
-              <div key={agent} className="rounded-xl border border-slate-700 p-4">
-                <div className="flex justify-between">
-                  <span className="text-sm font-semibold">{labels[agent]}</span>
-                  <span className={`text-xs ${state.status === "done" ? "text-emerald-300" : state.status === "running" ? "text-cyan-300" : "text-slate-500"}`}>{state.status}</span>
-                </div>
-                <p className="mt-3 min-h-12 text-xs leading-5 text-slate-400">{state.text ?? "Awaiting turn…"}</p>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+      <AgentSteps states={agentStates} rules={company.rules} onSelectRule={setOpenRule} />
 
       <KpiCards company={company} result={result} />
 
