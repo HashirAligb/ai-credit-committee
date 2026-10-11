@@ -11,7 +11,7 @@ export function Sliders({ drop, rate, onDrop, onRate }: Props) {
       </label>
       <input id="drop" className="mb-8 w-full accent-cyan-300" type="range" min="0" max="60" value={drop} onChange={(e) => onDrop(+e.target.value)} />
       <label htmlFor="rate" className="mb-2 flex justify-between text-sm text-slate-300">
-        Refinancing rate <b className="text-cyan-300">{rate.toFixed(1)}%</b>
+        Refinancing rate <b className="text-cyan-300">{+rate.toFixed(2)}%</b>
       </label>
       <input id="rate" className="w-full accent-cyan-300" type="range" min="0.5" max="15" step="0.1" value={rate} onChange={(e) => onRate(+e.target.value)} />
     </Card>
