@@ -1,13 +1,13 @@
 {"events":[
   {"type":"agent_started","data":{"agent":"financial_analyst"}},
-  {"type":"agent_done","data":{"agent":"financial_analyst","text":"Pizza Co. generates $50M of baseline free cash flow on $100M of EBITDA. Total debt is $400M, with a 4.0x leverage ratio and 5.0x interest coverage.","sources":["2024 financial statements"]}},
   {"type":"agent_started","data":{"agent":"contract_analyst"}},
-  {"type":"agent_done","data":{"agent":"contract_analyst","text":"The agreement permits leverage up to 5.00x and requires at least 2.00x interest coverage. Pizza Co. passes both tests at baseline.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
+  {"type":"agent_done","data":{"agent":"financial_analyst","text":"Pizza Co. turns $100M of EBITDA into $50M of free cash flow a year after $30M of capex and $20M of interest. It carries $400M of debt against $100M of cash, which puts leverage at 4.0x and interest coverage at 5.0x.","sources":["10-K income statement","10-K cash flow statement","10-K balance sheet"]}},
+  {"type":"agent_done","data":{"agent":"contract_analyst","text":"The credit agreement caps leverage at 5.00x and requires interest coverage of at least 2.00x. At 4.0x and 5.0x, Pizza Co. passes both rules today.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
   {"type":"agent_started","data":{"agent":"bull"}},
-  {"type":"agent_done","data":{"agent":"bull","text":"The business has ample cash generation and significant covenant headroom. I recommend lending.","sources":["2024 financial statements"]}},
   {"type":"agent_started","data":{"agent":"bear"}},
-  {"type":"agent_done","data":{"agent":"bear","text":"Debt is meaningful, but the current coverage cushion and cash balance offset the risk.","sources":["2024 financial statements"]}},
+  {"type":"agent_done","data":{"agent":"bull","text":"Lend. This business throws off $50M of free cash flow a year and covers its interest 5.0x over. Leverage of 4.0x leaves a full turn of headroom under the 5.00x cap, so earnings could fall 20% before a rule is even tested.","sources":["10-K cash flow statement","Credit agreement §7.11(a)"]}},
+  {"type":"agent_done","data":{"agent":"bear","text":"Don't lend. The whole $400M comes due at once in 2028, and four years of free cash flow only adds about $200M. Even counting the $100M already in the bank, that is $300M against a $400M bill, with no revolver to bridge the gap. Repayment depends on a refinancing we don't control.","sources":["Maturity wall","10-K debt footnote","10-K cash flow statement"]}},
   {"type":"agent_started","data":{"agent":"chair"}},
-  {"type":"agent_done","data":{"agent":"chair","text":"Both covenants pass with room to spare. The committee recommends lending.","sources":["Committee analysis"]}},
-  {"type":"verdict","data":{"decision":"lend","text":"Lend — Pizza Co. passes both loan rules at baseline."}}
+  {"type":"agent_done","data":{"agent":"chair","text":"Both loan rules pass with room to spare: 4.0x leverage against a 5.00x cap and 5.0x coverage against a 2.00x floor. The Bear is right that 2028 needs a refinancing, but a borrower with this cash flow and headroom should be able to get one. The committee votes to lend.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)","Maturity wall"]}},
+  {"type":"verdict","data":{"decision":"lend","text":"Lend. Pizza Co. passes both loan rules with headroom and generates $50M of free cash flow a year. Watch the 2028 maturity: $400M due against about $300M of cash means it will need to refinance."}}
 ]}

@@ -1,13 +1,13 @@
 {"events":[
   {"type":"agent_started","data":{"agent":"financial_analyst"}},
-  {"type":"agent_done","data":{"agent":"financial_analyst","text":"Under stress, EBITDA falls to $70M and free cash flow falls to $10M. Refinancing at 10% raises annual interest to $40M.","sources":["Stress calculator"]}},
   {"type":"agent_started","data":{"agent":"contract_analyst"}},
-  {"type":"agent_done","data":{"agent":"contract_analyst","text":"The 5.00x maximum leverage and 2.00x minimum coverage rules both fail under this scenario: leverage is 5.71x and coverage is 1.75x.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
+  {"type":"agent_done","data":{"agent":"financial_analyst","text":"In this scenario EBITDA falls 30% to $70M, and refinancing at 10% doubles the interest bill to $40M. Free cash flow drops from $50M to zero, so cash stays stuck at $100M. Leverage rises to 5.71x and coverage falls to 1.75x.","sources":["10-K income statement","10-K cash flow statement","What-if calculator"]}},
+  {"type":"agent_done","data":{"agent":"contract_analyst","text":"Both loan rules fail. Leverage of 5.71x is over the 5.00x cap, and coverage of 1.75x is under the 2.00x floor.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
   {"type":"agent_started","data":{"agent":"bull"}},
-  {"type":"agent_done","data":{"agent":"bull","text":"Pizza Co. still produces positive cash flow, and the stress case could prove temporary.","sources":["Stress calculator"]}},
   {"type":"agent_started","data":{"agent":"bear"}},
-  {"type":"agent_done","data":{"agent":"bear","text":"The borrower breaches both covenants with limited liquidity before the 2028 maturity. We should not lend.","sources":["Stress calculator","Credit agreement §7.11"]}},
+  {"type":"agent_done","data":{"agent":"bull","text":"The case to lend is thin but real: Pizza Co. still earns $70M of EBITDA and isn't burning cash. If the earnings drop is temporary, a waiver and tighter terms could carry it through.","sources":["What-if calculator"]}},
+  {"type":"agent_done","data":{"agent":"bear","text":"Don't lend. Both rules are broken, at 5.71x leverage and 1.75x coverage. Free cash flow is zero, so the $100M of cash never grows, and $400M still comes due in 2028. We would be lending into a default.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)","Maturity wall"]}},
   {"type":"agent_started","data":{"agent":"chair"}},
-  {"type":"agent_done","data":{"agent":"chair","text":"The covenant breaches outweigh the remaining cash generation. The committee recommends not lending.","sources":["Committee analysis"]}},
-  {"type":"verdict","data":{"decision":"dont_lend","text":"Don't lend — the stressed case breaches both loan rules."}}
+  {"type":"agent_done","data":{"agent":"chair","text":"The Bull's case depends on a recovery we can't underwrite. With both rules breached and no free cash flow to build toward the 2028 maturity, the committee votes not to lend.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)","Maturity wall"]}},
+  {"type":"verdict","data":{"decision":"dont_lend","text":"Don't lend. Leverage of 5.71x breaks the 5.00x cap, coverage of 1.75x breaks the 2.00x floor, and with zero free cash flow there is only $100M to meet $400M due in 2028."}}
 ]}
