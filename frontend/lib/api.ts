@@ -1,21 +1,27 @@
 // All backend calls live here. Types mirror the API contract in CLAUDE.md.
 export const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-export type Rule = { type: "max_leverage" | "min_coverage"; threshold: number; section: string; quote: string };
+export type RuleType = "max_leverage" | "max_net_leverage" | "min_coverage";
+export type Rule = {
+  type: RuleType; threshold: number; section: string; quote: string;
+  schedule: { year: number; threshold: number }[]; // how the threshold changes over time
+  source_url: string | null;
+};
 
 export type Company = {
   ticker: string; name: string; fictional: boolean; fiscal_year: number;
+  caption: string | null; covenant_url: string | null;
   facts: { cash: number; ocf: number; capex: number; ebitda: number; interest: number; total_debt: number; revolver: number };
-  maturities: { year: number; amount: number }[];
+  maturities: { year: number | null; amount: number }[]; // year null = "thereafter"
   rules: Rule[];
 };
 
 export type RuleCheck = { type: string; value: number | null; threshold: number; passed: boolean };
 
 export type CalcResult = {
-  ebitda: number; interest: number; fcf: number; leverage: number | null; coverage: number;
+  ebitda: number; interest: number; fcf: number; leverage: number | null; net_leverage: number | null; coverage: number;
   rule_checks: RuleCheck[];
-  wall: { year: number; debt_due: number; cash_available: number }[];
+  wall: { year: number; label: string; debt_due: number; cash_available: number }[]; // label is "2028" or "2031+"
 };
 
 export type Agent = "financial_analyst" | "contract_analyst" | "bull" | "bear" | "chair";

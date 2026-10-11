@@ -14,7 +14,12 @@ def load_company(ticker: str) -> Company:
     path = ROOT / "data" / "companies" / f"{ticker.upper()}.json"
     if not path.exists():
         raise HTTPException(status_code=404, detail=f"Company {ticker.upper()} not found")
-    return Company.model_validate(json.loads(path.read_text()))
+    config = json.loads(path.read_text())
+    # Until SEC ingestion exists, the hardcoded "overrides" are the facts.
+    config.setdefault("facts", config.get("overrides"))
+    for rule in config["rules"]:
+        rule.setdefault("source_url", config.get("covenant_url"))
+    return Company.model_validate(config)
 
 
 @router.get("/company/{ticker}", response_model=Company)

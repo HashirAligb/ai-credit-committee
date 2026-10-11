@@ -1,19 +1,15 @@
 """Checks the pipeline's shape and the fallback without calling Gemini."""
 import asyncio
-import json
-from pathlib import Path
-
 from app.agents import routes
 from app.agents.briefing import build_briefing
 from app.agents.contract import AgentOutput
 from app.agents.debate import ChairOutput
 from app.agents.graph import run_committee
-from app.models import CalcRequest, Company
+from app.models import CalcRequest
 from app.numbers.calculator import calculate
+from app.numbers.routes import load_company
 
-COMPANY = Company.model_validate(json.loads(
-    (Path(__file__).parents[2] / "data/companies/PZCO.json").read_text()
-))
+COMPANY = load_company("PZCO")
 
 
 async def fake_ask(role, briefing, schema):
@@ -64,3 +60,13 @@ def test_gemini_failure_falls_back_to_saved_run(monkeypatch):
     chunks = asyncio.run(collect(routes.run_events("test")))
     assert chunks[-1].startswith("event: verdict")
     assert '"decision": "dont_lend"' in chunks[-1]
+
+
+def test_silgan_briefing_uses_net_leverage_and_the_step_down():
+    silgan = load_company("SLGN")
+    briefing = build_briefing(silgan, calculate(silgan, 30, 10), 30, 10)
+    assert "Net leverage (the ratio the loan rule tests): 5.12x" in briefing
+    assert "Total debt: $4.36B" in briefing
+    assert "5.25x through 2025, 5.00x in 2026, 4.75x in 2027, 4.50x from 2028 on" in briefing
+    assert "2028 is also the year $1.38B of debt comes due" in briefing
+    assert "2031+: $710M of debt due" in briefing

@@ -14,15 +14,23 @@ class Facts(BaseModel):
 
 
 class Maturity(BaseModel):
-    year: int
+    year: int | None  # None = "thereafter", everything due after the last listed year
     amount: float
 
 
+class ScheduleStep(BaseModel):
+    year: int  # the threshold applies from this year until the next step
+    threshold: float
+
+
 class Rule(BaseModel):
-    type: Literal["max_leverage", "min_coverage"]
+    # max_leverage = total debt / EBITDA. max_net_leverage = (total debt - cash) / EBITDA.
+    type: Literal["max_leverage", "max_net_leverage", "min_coverage"]
     threshold: float
     section: str
     quote: str
+    schedule: list[ScheduleStep] = []  # how the threshold changes over time, if it does
+    source_url: str | None = None
 
 
 class Company(BaseModel):
@@ -30,6 +38,8 @@ class Company(BaseModel):
     name: str
     fictional: bool
     fiscal_year: int
+    caption: str | None = None
+    covenant_url: str | None = None  # the document the loan rules are quoted from
     facts: Facts
     maturities: list[Maturity]
     rules: list[Rule]
@@ -50,6 +60,7 @@ class RuleCheck(BaseModel):
 
 class WallPoint(BaseModel):
     year: int
+    label: str  # what the chart shows: "2028", or "2031+" for the thereafter bucket
     debt_due: float
     cash_available: float
 
@@ -59,6 +70,7 @@ class CalcResult(BaseModel):
     interest: float
     fcf: float
     leverage: float | None
+    net_leverage: float | None
     coverage: float
     rule_checks: list[RuleCheck]
     wall: list[WallPoint]

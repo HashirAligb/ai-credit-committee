@@ -1,0 +1,81 @@
+{
+  "ticker": "SLGN",
+  "name": "Silgan Holdings Inc.",
+  "cik": "0000849869",
+  "fiscal_year": 2025,
+  "fictional": false,
+  "credit_agreement_url": "https://www.sec.gov/Archives/edgar/data/849869/000119312517104035/d309081dex101.htm",
+  "covenant_url": "https://www.sec.gov/Archives/edgar/data/849869/000119312524254253/d865465dex101.htm",
+  "caption": "Illustrative: EBITDA = operating income + D&A, not covenant EBITDA with add-backs. Data from Silgan's FY2025 10-K.",
+  "overrides": {
+    "cash": 1080659000,
+    "ocf": 729841000,
+    "capex": 307092000,
+    "ebitda": 915406000,
+    "interest": 189365000,
+    "total_debt": 4364678000,
+    "revolver": 1478300000
+  },
+  "maturities": [
+    { "year": 2026, "amount": 627926000 },
+    { "year": 2027, "amount": 194322000 },
+    { "year": 2028, "amount": 1379544000 },
+    { "year": 2029, "amount": 192306000 },
+    { "year": 2030, "amount": 1221976000 },
+    { "year": null, "amount": 709821000 }
+  ],
+  "rules": [
+    {
+      "type": "max_net_leverage",
+      "threshold": 5.0,
+      "section": "9.08",
+      "quote": "to be greater than the corresponding ratio set forth below:",
+      "schedule": [
+        { "year": 2025, "threshold": 5.25 },
+        { "year": 2026, "threshold": 5.0 },
+        { "year": 2027, "threshold": 4.75 },
+        { "year": 2028, "threshold": 4.5 }
+      ]
+    },
+    {
+      "type": "min_coverage",
+      "threshold": 3.0,
+      "section": "9.07",
+      "quote": "to be less than 3.00:1.00."
+    }
+  ],
+  "sources": {
+    "10k": "https://www.sec.gov/Archives/edgar/data/849869/000162828026012202/slgn-20251231.htm",
+    "basis": "Latest 10-K: year ended 2025-12-31, filed 2026-02-26. Financial inputs and maturities use that snapshot. All monetary values are USD.",
+    "cash": "10-K F-3; us-gaap:CashAndCashEquivalentsAtCarryingValue.",
+    "ocf": "10-K F-7; us-gaap:NetCashProvidedByUsedInOperatingActivities.",
+    "capex": "10-K F-7; us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; cash expenditure entered positively.",
+    "operating_income": "596243000, derived from 10-K F-4: reported EBIT 597867000 minus other pension/postretirement income 1624000.",
+    "depreciation_amortization": "319163000; 10-K F-7; us-gaap:DepreciationDepletionAndAmortization.",
+    "ebitda": "596243000 + 319163000 = 915406000; requested operating-income-plus-D&A proxy.",
+    "interest": "10-K F-4; us-gaap:InterestExpense; reported interest and other debt expense.",
+    "total_debt": "10-K Note 9, F-16: gross principal, including finance leases. Carrying value after issuance costs/discount: 4346848000.",
+    "revolver": "10-K p. 40: approximately 1500000000 commitment minus zero borrowings minus 21700000 letters of credit; calculated from rounded disclosures.",
+    "maturities": "10-K Note 9, F-16. Excludes finance leases of 38783000. year=null means thereafter, 2031 onward. Foreign-currency principal translated at year-end exchange rates.",
+    "amendment_1_2018": "https://www.sec.gov/Archives/edgar/data/849869/000119312518184480/d579297dex101.htm",
+    "amendment_2_2021": "https://www.sec.gov/Archives/edgar/data/849869/000119312521026652/d13603dex101.htm",
+    "amendment_3_2021": "https://www.sec.gov/Archives/edgar/data/849869/000119312521328127/d206943dex101.htm",
+    "amendment_4_2023": "https://www.sec.gov/Archives/edgar/data/849869/000084986923000132/fourthamendmenttoamended.htm",
+    "amendment_5_2024": "https://www.sec.gov/Archives/edgar/data/849869/000119312524254253/d865465dex101.htm",
+    "amendment_6_2026": "https://www.sec.gov/Archives/edgar/data/849869/000162828026031008/exhibit1013-31x2026.htm",
+    "amendment_status": "The Third Amendment changed the leverage schedule; the Fifth Amendment supplies the applicable schedule and amended definitions. The Sixth Amendment, dated 2026-03-06, changes pricing and administrative details, without changing these maintenance thresholds.",
+    "quote_scope": "Quotation limits permit short verbatim excerpts here, not complete covenant sentences. Both excerpts are from Fifth Amendment Annex A; the leverage threshold appears in its accompanying table.",
+    "testing": "Sections 9.07–9.08: quarterly, trailing four quarters. These are maintenance tests without a revolver-utilization trigger.",
+    "threshold_schedule": "Section 9.08: 5.25x through 2025; 5.00x during 2026; 4.75x during 2027; 4.50x from 2028. rules uses 2026 thresholds; use 5.25 for a historical 2025 test.",
+    "acquisition_step_up": "Section 9.08 permits an elected 0.50x increase for qualifying acquisitions exceeding $20 million, lasting four quarters, with a quarter between increases; unavailable during a Collateral Release Period.",
+    "covenant_ebitda_definition": "Section 1.01 names the measure EBITDA. Adjusted consolidated earnings receive add-backs including D&A, impairments, transaction fees, severance, noncash items, restructuring and qualifying synergies. Nonrecurring-charge basket: $100 million annually. Synergies have a 24-month action window. Selected add-backs and pro-forma adjustments face a 30% post-adjustment EBITDA cap, subject to acquisition-related exceptions.",
+    "leverage_definition": "Section 1.01 deducts unrestricted cash and uses preceding December 31 balances for defined revolving exposures, including letters of credit, subject to exceptions. Gross debt/EBITDA is not the contractual calculation.",
+    "coverage_definition": "Section 1.01 uses covenant EBITDA divided by defined Interest Expense, net of interest income and excluding specified issuance/refinancing costs.",
+    "reported_covenant_ebitda": null,
+    "reported_covenant_leverage": null,
+    "model_limitation": "An exact covenant EBITDA reconciliation and reported covenant leverage ratio were not found in the filings reviewed. The overrides support an illustrative stress test, not a verified legal compliance determination.",
+    "credit_rating": "S&P BB+, stable outlook, reaffirmed 2026-02-25, as reported by Cbonds: https://cbonds.com/news/3808479/",
+    "subsequent_events": "The June 2026 10-Q reports repayment of the $500 million 2026 notes on 2026-03-31, funded with revolver borrowings and cash. Therefore the annual maturity schedule above is historical, not today's remaining schedule. https://www.sec.gov/Archives/edgar/data/849869/000162828026053967/slgn-20260630.htm",
+    "demo_rationale": "Silgan combines speculative-grade credit, recurring maintenance tests and substantial 2028 refinancing needs. Using the requested proxy, net leverage is 3.59x and coverage is 4.83x. Holding debt, cash and interest constant, a 30% EBITDA decline raises leverage to 5.12x, above the 2026 limit; a 40% decline also reduces coverage to 2.90x. The bull scenario is sustained cash generation and productivity improvements supporting repayment. The bear scenario is weaker packaging demand and margin pressure while covenant limits tighten. These are illustrative proxy outcomes; contractual add-backs can materially change actual headroom."
+  }
+}
