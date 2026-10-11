@@ -19,8 +19,8 @@ export function MaturityWall({ wall }: { wall: CalcResult["wall"] }) {
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart data={wall} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
           <CartesianGrid stroke="#1c3049" vertical={false} />
-          <XAxis dataKey="year" stroke={AXIS_COLOR} tickLine={false} />
-          <YAxis tickFormatter={money} stroke={AXIS_COLOR} tickLine={false} axisLine={false} width={64} />
+          <XAxis dataKey="label" stroke={AXIS_COLOR} tickLine={false} />
+          <YAxis tickFormatter={money} stroke={AXIS_COLOR} tickLine={false} axisLine={false} width={72} />
           <Tooltip
             formatter={(value: number) => money(value)}
             cursor={{ fill: "#ffffff", fillOpacity: 0.05 }}
@@ -37,7 +37,7 @@ export function MaturityWall({ wall }: { wall: CalcResult["wall"] }) {
       <p className="mt-3 text-sm text-slate-300">
         {short.length === 0
           ? "Cash on hand covers the debt due in every year."
-          : short.map((point) => `${point.year}: ${money(point.debt_due)} due vs ${money(point.cash_available)} of cash, a ${money(point.debt_due - point.cash_available)} gap to refinance.`).join(" ")}
+          : short.map((point) => `${point.label}: ${money(point.debt_due)} due vs ${money(point.cash_available)} of cash, a ${money(point.debt_due - point.cash_available)} gap to refinance.`).join(" ")}
       </p>
     </Card>
   );
