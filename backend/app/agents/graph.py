@@ -12,9 +12,15 @@ from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
 
 from app.agents import contract, debate
+from app.agents.briefing import build_briefing
+from app.numbers.calculator import calculate
+from app.numbers.routes import load_company
 
 
 class CommitteeState(TypedDict, total=False):
+    ticker: str
+    earnings_drop_pct: float
+    refi_rate_pct: float
     briefing: str
     financial_analyst: str
     contract_analyst: str
@@ -37,11 +43,21 @@ async def financial_analyst(state: CommitteeState) -> CommitteeState:
     return {"financial_analyst": output.text}
 
 
+def briefing_for(state: CommitteeState) -> str:
+    company = load_company(state["ticker"])
+    calc = calculate(company, state["earnings_drop_pct"], state["refi_rate_pct"])
+    return build_briefing(company, calc, state["earnings_drop_pct"], state["refi_rate_pct"])
+
+
 async def contract_analyst(state: CommitteeState) -> CommitteeState:
     started("contract_analyst")
-    output = await contract.run_contract_analyst(state["briefing"])
+    # First run for a company: read the real contract (cached after that), then rebuild the
+    # briefing so everyone downstream sees the full quotes and the threshold schedule.
+    await contract.ensure_contract_is_read(load_company(state["ticker"]))
+    briefing = briefing_for(state)
+    output = await contract.run_contract_analyst(briefing)
     done("contract_analyst", output)
-    return {"contract_analyst": output.text}
+    return {"contract_analyst": output.text, "briefing": briefing}
 
 
 def analyst_notes(state: CommitteeState) -> dict[str, str]:
@@ -88,7 +104,9 @@ def build_graph():
 COMMITTEE = build_graph()
 
 
-async def run_committee(briefing: str) -> AsyncIterator[dict]:
+async def run_committee(ticker: str, earnings_drop_pct: float, refi_rate_pct: float) -> AsyncIterator[dict]:
     """Yields {"type": ..., "data": ...} events in the SSE format from CLAUDE.md."""
-    async for event in COMMITTEE.astream({"briefing": briefing}, stream_mode="custom"):
+    state: CommitteeState = {"ticker": ticker, "earnings_drop_pct": earnings_drop_pct, "refi_rate_pct": refi_rate_pct}
+    state["briefing"] = briefing_for(state)
+    async for event in COMMITTEE.astream(state, stream_mode="custom"):
         yield event

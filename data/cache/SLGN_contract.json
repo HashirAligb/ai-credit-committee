@@ -1,0 +1,37 @@
+{
+  "source_url": "https://www.sec.gov/Archives/edgar/data/849869/000119312524254253/d865465dex101.htm",
+  "quotes_verified_in_document": true,
+  "rules": [
+    {
+      "type": "max_net_leverage",
+      "section": "9.08",
+      "quote": "None of the Borrowers will permit the Total Net Leverage Ratio for any Test Period ended on the last day of a fiscal quarter of Silgan ending during the periods specified below to be greater than the corresponding ratio set forth below:",
+      "threshold": 5.0,
+      "schedule": [
+        {
+          "year": 2025,
+          "threshold": 5.25
+        },
+        {
+          "year": 2026,
+          "threshold": 5.0
+        },
+        {
+          "year": 2027,
+          "threshold": 4.75
+        },
+        {
+          "year": 2028,
+          "threshold": 4.5
+        }
+      ]
+    },
+    {
+      "type": "min_coverage",
+      "section": "9.07",
+      "quote": "None of the Borrowers will permit the Interest Coverage Ratio for any Test Period ended on the last day of a fiscal quarter of Silgan to be less than 3.00:1.00.",
+      "threshold": 3.0,
+      "schedule": []
+    }
+  ]
+}

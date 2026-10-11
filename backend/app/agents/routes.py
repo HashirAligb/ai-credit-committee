@@ -8,7 +8,6 @@ from collections.abc import AsyncIterator
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
-from app.agents.briefing import build_briefing
 from app.agents.graph import run_committee
 from app.models import CalcRequest, CalcResult
 from app.numbers.calculator import calculate
@@ -55,9 +54,8 @@ async def run_events(run_id: str) -> AsyncIterator[str]:
     calc = calculate(company, request.earnings_drop_pct, request.refi_rate_pct)
 
     if os.getenv("DEMO_MODE") != "1":
-        briefing = build_briefing(company, calc, request.earnings_drop_pct, request.refi_rate_pct)
         try:
-            async for event in run_committee(briefing):
+            async for event in run_committee(company.ticker, request.earnings_drop_pct, request.refi_rate_pct):
                 yield sse(event["type"], event["data"])
             return
         except Exception:

@@ -55,7 +55,11 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
       const { run_id } = await createRun(ticker, drop, rate);
       closeStream.current = streamRun(run_id, {
         onAgentStarted: (agent) => setAgentStates((s) => ({ ...s, [agent]: { status: "running" } })),
-        onAgentDone: (agent, text, sources) => setAgentStates((s) => ({ ...s, [agent]: { status: "done", text, sources } })),
+        onAgentDone: (agent, text, sources) => {
+          setAgentStates((s) => ({ ...s, [agent]: { status: "done", text, sources } }));
+          // The Contract Analyst may have just read the real contract; pick up its quotes.
+          if (agent === "contract_analyst") getCompany(ticker).then(setCompany).catch(() => {});
+        },
         onVerdict: (data) => { setVerdict(data); setRunning(false); },
         onError: fail,
       });
