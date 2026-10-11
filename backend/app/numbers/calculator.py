@@ -22,11 +22,18 @@ def calculate(company: Company, earnings_drop_pct: float, refi_rate_pct: float) 
             checks.append(RuleCheck(type=rule.type, value=coverage, threshold=rule.threshold,
                                     passed=coverage >= rule.threshold))
 
-    cash_available = facts.cash + facts.revolver
+    # One point per year from next fiscal year through the last maturity, so the
+    # chart has no gaps. Cash builds by one year of stressed FCF each year.
+    due_by_year: dict[int, float] = {}
+    for maturity in company.maturities:
+        due_by_year[maturity.year] = due_by_year.get(maturity.year, 0) + maturity.amount
+    first_year = company.fiscal_year + 1
+    last_year = max(due_by_year, default=first_year + 4)
     wall: list[WallPoint] = []
-    for maturity in sorted(company.maturities, key=lambda item: item.year):
-        cash_available += stressed_fcf
-        wall.append(WallPoint(year=maturity.year, debt_due=maturity.amount, cash_available=cash_available))
+    for year in range(first_year, last_year + 1):
+        years_out = year - company.fiscal_year
+        cash_available = facts.cash + stressed_fcf * years_out + facts.revolver
+        wall.append(WallPoint(year=year, debt_due=due_by_year.get(year, 0), cash_available=cash_available))
 
     return CalcResult(ebitda=stressed_ebitda, interest=stressed_interest, fcf=stressed_fcf,
                       leverage=leverage, coverage=coverage, rule_checks=checks, wall=wall)
