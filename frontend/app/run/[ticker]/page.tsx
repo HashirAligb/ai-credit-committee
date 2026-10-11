@@ -1,12 +1,11 @@
 "use client";
 import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Agent, calculate, CalcResult, Company, createRun, getCompany, Rule, streamRun, Verdict } from "../../../lib/api";
-import { money } from "../../../lib/format";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { KpiCards } from "../../../components/kpi-cards";
+import { MaturityWall } from "../../../components/maturity-wall";
 import { RulesPanel } from "../../../components/rules-panel";
 import { Sliders } from "../../../components/sliders";
 import { SourceDrawer } from "../../../components/source-drawer";
@@ -104,19 +103,7 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
       <KpiCards company={company} result={result} />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <h2 className="mb-5 text-lg font-bold">Maturity wall</h2>
-          <ResponsiveContainer width="100%" height={260}>
-            <ComposedChart data={result.wall}>
-              <CartesianGrid stroke="#1c3049" />
-              <XAxis dataKey="year" stroke="#91a1b8" />
-              <YAxis tickFormatter={(v) => `$${v / 1e6}M`} stroke="#91a1b8" />
-              <Tooltip formatter={(v: number) => money(v)} />
-              <Bar dataKey="debt_due" fill="#f87171" name="Debt due" />
-              <Line dataKey="cash_available" stroke="#22d3ee" strokeWidth={3} name="Cash available" />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </Card>
+        <MaturityWall wall={result.wall} />
         <Sliders drop={drop} rate={rate} onDrop={setDrop} onRate={setRate} />
       </div>
 
