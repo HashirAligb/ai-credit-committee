@@ -1,0 +1,103 @@
+{
+ "ticker": "SLGN",
+ "earnings_drop_pct": 30.0,
+ "refi_rate_pct": 10.0,
+ "events": [
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "contract_analyst"
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "financial_analyst"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "contract_analyst",
+    "text": "Under credit agreement §9.08, the maximum net leverage ratio must be at most 5.00x, and the company fails this with 5.12x in this scenario. Under credit agreement §9.07, the minimum interest coverage ratio must be at least 3.00x, and the company fails this with 1.47x.",
+    "sources": [
+     "Credit agreement §9.08",
+     "Credit agreement §9.07",
+     "What-if calculator"
+    ]
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "financial_analyst",
+    "text": "An earnings decline of 30% drops EBITDA to $641M and produces a negative free cash flow per year of -$99M. Refinancing debt at 10.00% pushes annual interest to $436M, resulting in an interest coverage of 1.47x. Net leverage hits 5.12x, breaching the 5.00x cap.",
+    "sources": [
+     "What-if calculator",
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "bear"
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "bull"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "bull",
+    "text": "Lend. Sure, the net leverage hits 5.12x against the 5.00x cap and interest coverage drops to 1.47x, but look at the liquidity cushion with $1.48B in the undrawn revolver and $1.08B of cash. We can easily secure a waiver with tighter terms while they ride out this temporary dip.",
+    "sources": [
+     "What-if calculator",
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "bear",
+    "text": "Don't lend. Both loan covenants are breached with net leverage hitting 5.12x against the 5.00x cap and interest coverage collapsing to 1.47x. The limit tightens further to 4.50x in 2028, exactly when $1.38B of debt comes due.",
+    "sources": [
+     "Credit agreement §9.08",
+     "Credit agreement §9.07",
+     "Maturity wall"
+    ]
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "chair"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "chair",
+    "text": "Don't lend. Both loan covenants are breached with net leverage hitting 5.12x against the 5.00x cap and interest coverage collapsing to 1.47x. The bull argues we can secure a waiver on the back of $1.08B in cash, but a fund does not lend into a covenant breach.",
+    "sources": [
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "verdict",
+   "data": {
+    "decision": "dont_lend",
+    "text": "Don't lend. Both loan covenants are breached with net leverage hitting 5.12x against the 5.00x cap and interest coverage collapsing to 1.47x. The bull argues we can secure a waiver on the back of $1.08B in cash, but a fund does not lend into a covenant breach."
+   }
+  }
+ ]
+}

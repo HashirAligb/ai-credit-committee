@@ -1,0 +1,102 @@
+{
+ "ticker": "SLGN",
+ "earnings_drop_pct": 0.0,
+ "refi_rate_pct": 4.34,
+ "events": [
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "contract_analyst"
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "financial_analyst"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "contract_analyst",
+    "text": "The maximum net leverage rule requires the ratio to be at most 5.00x, and the company passes with 3.59x. The minimum interest coverage rule requires at least 3.00x, and the company passes with 4.83x.",
+    "sources": [
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "financial_analyst",
+    "text": "Silgan posts $915M of EBITDA and $423M of free cash flow with zero earnings change in this scenario. Net leverage sits at 3.59x against the 5.00x cap, and interest coverage is 4.83x against the 3.00x floor. Total debt is $4.36B and cash is $1.08B.",
+    "sources": [
+     "What-if calculator",
+     "10-K balance sheet",
+     "Credit agreement §9.08"
+    ]
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "bear"
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "bull"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "bear",
+    "text": "Don't lend. The leverage limit tightens to 4.50x in 2028, right when $1.38B of debt comes due. We are totally dependent on refinancing to clear that maturity wall.",
+    "sources": [
+     "Credit agreement §9.08",
+     "Maturity wall"
+    ]
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "bull",
+    "text": "Lend. Net leverage sits at a comfortable 3.59x against the 5.00x cap, and interest coverage hits 4.83x against the 3.00x floor. The business generates $423M of free cash flow on $915M of EBITDA, easily covering every upcoming maturity wall.",
+    "sources": [
+     "What-if calculator",
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "agent_started",
+   "data": {
+    "agent": "chair"
+   }
+  },
+  {
+   "type": "agent_done",
+   "data": {
+    "agent": "chair",
+    "text": "Lend. Net leverage sits at 3.59x against the 5.00x cap, and interest coverage hits 4.83x against the 3.00x floor with $423M of free cash flow. The bear points out that $1.38B comes due in 2028 when the leverage limit tightens to 4.50x, but that maturity is easily handled by cumulative cash and liquidity.",
+    "sources": [
+     "What-if calculator",
+     "Credit agreement §9.08",
+     "Credit agreement §9.07"
+    ]
+   }
+  },
+  {
+   "type": "verdict",
+   "data": {
+    "decision": "lend",
+    "text": "Lend. Net leverage sits at 3.59x against the 5.00x cap, and interest coverage hits 4.83x against the 3.00x floor with $423M of free cash flow. The bear points out that $1.38B comes due in 2028 when the leverage limit tightens to 4.50x, but that maturity is easily handled by cumulative cash and liquidity."
+   }
+  }
+ ]
+}

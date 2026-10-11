@@ -9,7 +9,8 @@ NAMES = {
 
 
 def money(amount: float) -> str:
-    return f"${amount / 1e9:.2f}B" if abs(amount) >= 1e9 else f"${amount / 1e6:,.0f}M"
+    sign, amount = ("-" if amount < 0 else ""), abs(amount)
+    return f"{sign}${amount / 1e9:.2f}B" if amount >= 1e9 else f"{sign}${amount / 1e6:,.0f}M"
 
 
 def ratio(value: float | None) -> str:

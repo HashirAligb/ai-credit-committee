@@ -72,6 +72,7 @@ def test_silgan_briefing_uses_net_leverage_and_the_step_down():
     assert "5.25x through 2025, 5.00x in 2026, 4.75x in 2027, 4.50x from 2028 on" in briefing
     assert "2028 is also the year $1.38B of debt comes due" in briefing
     assert "2031+: $710M of debt due" in briefing
+    assert "Free cash flow per year: -$99M" in briefing
 
 
 # ---- Reading the real contract (no network: a small fake document) ----
