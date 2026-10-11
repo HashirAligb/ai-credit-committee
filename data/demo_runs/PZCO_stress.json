@@ -1,0 +1,13 @@
+{"events":[
+  {"type":"agent_started","data":{"agent":"financial_analyst"}},
+  {"type":"agent_done","data":{"agent":"financial_analyst","text":"Under stress, EBITDA falls to $70M and free cash flow falls to $10M. Refinancing at 10% raises annual interest to $40M.","sources":["Stress calculator"]}},
+  {"type":"agent_started","data":{"agent":"contract_analyst"}},
+  {"type":"agent_done","data":{"agent":"contract_analyst","text":"The 5.00x maximum leverage and 2.00x minimum coverage rules both fail under this scenario: leverage is 5.71x and coverage is 1.75x.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
+  {"type":"agent_started","data":{"agent":"bull"}},
+  {"type":"agent_done","data":{"agent":"bull","text":"Pizza Co. still produces positive cash flow, and the stress case could prove temporary.","sources":["Stress calculator"]}},
+  {"type":"agent_started","data":{"agent":"bear"}},
+  {"type":"agent_done","data":{"agent":"bear","text":"The borrower breaches both covenants with limited liquidity before the 2028 maturity. We should not lend.","sources":["Stress calculator","Credit agreement §7.11"]}},
+  {"type":"agent_started","data":{"agent":"chair"}},
+  {"type":"agent_done","data":{"agent":"chair","text":"The covenant breaches outweigh the remaining cash generation. The committee recommends not lending.","sources":["Committee analysis"]}},
+  {"type":"verdict","data":{"decision":"dont_lend","text":"Don't lend — the stressed case breaches both loan rules."}}
+]}

@@ -1,0 +1,13 @@
+{"events":[
+  {"type":"agent_started","data":{"agent":"financial_analyst"}},
+  {"type":"agent_done","data":{"agent":"financial_analyst","text":"Pizza Co. generates $50M of baseline free cash flow on $100M of EBITDA. Total debt is $400M, with a 4.0x leverage ratio and 5.0x interest coverage.","sources":["2024 financial statements"]}},
+  {"type":"agent_started","data":{"agent":"contract_analyst"}},
+  {"type":"agent_done","data":{"agent":"contract_analyst","text":"The agreement permits leverage up to 5.00x and requires at least 2.00x interest coverage. Pizza Co. passes both tests at baseline.","sources":["Credit agreement §7.11(a)","Credit agreement §7.11(b)"]}},
+  {"type":"agent_started","data":{"agent":"bull"}},
+  {"type":"agent_done","data":{"agent":"bull","text":"The business has ample cash generation and significant covenant headroom. I recommend lending.","sources":["2024 financial statements"]}},
+  {"type":"agent_started","data":{"agent":"bear"}},
+  {"type":"agent_done","data":{"agent":"bear","text":"Debt is meaningful, but the current coverage cushion and cash balance offset the risk.","sources":["2024 financial statements"]}},
+  {"type":"agent_started","data":{"agent":"chair"}},
+  {"type":"agent_done","data":{"agent":"chair","text":"Both covenants pass with room to spare. The committee recommends lending.","sources":["Committee analysis"]}},
+  {"type":"verdict","data":{"decision":"lend","text":"Lend — Pizza Co. passes both loan rules at baseline."}}
+]}
