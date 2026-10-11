@@ -1,35 +1,131 @@
 "use client";
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { API, calculate, Company, CalcResult, createRun, getCompany } from "../../../lib/api";
-import { Card } from "../../../components/ui/card";
+import { Agent, calculate, CalcResult, Company, createRun, getCompany, Rule, streamRun, Verdict } from "../../../lib/api";
+import { money } from "../../../lib/format";
 import { Button } from "../../../components/ui/button";
+import { Card } from "../../../components/ui/card";
+import { KpiCards } from "../../../components/kpi-cards";
+import { RulesPanel } from "../../../components/rules-panel";
+import { Sliders } from "../../../components/sliders";
+import { SourceDrawer } from "../../../components/source-drawer";
+import { VerdictCard } from "../../../components/verdict-card";
 
-const agents = ["financial_analyst", "contract_analyst", "bull", "bear", "chair"];
-const labels: Record<string, string> = { financial_analyst: "Financial Analyst", contract_analyst: "Contract Analyst", bull: "Bull", bear: "Bear", chair: "Committee Chair" };
-const money = (n: number) => `$${(n / 1e6).toFixed(0)}M`;
-const ratio = (n: number | null) => n === null ? "—" : `${n.toFixed(2)}x`;
+export type AgentState = { status: "waiting" | "running" | "done"; text?: string; sources?: string[] };
+type Scenario = { drop: number; rate: number };
+
+const agents: Agent[] = ["financial_analyst", "contract_analyst", "bull", "bear", "chair"];
+const labels: Record<Agent, string> = { financial_analyst: "Financial Analyst", contract_analyst: "Contract Analyst", bull: "Bull", bear: "Bear", chair: "Committee Chair" };
 
 export default function RunPage({ params }: { params: Promise<{ ticker: string }> }) {
-  const { ticker } = use(params); const router = useRouter();
-  const [company, setCompany] = useState<Company | null>(null); const [result, setResult] = useState<CalcResult | null>(null);
-  const [drop, setDrop] = useState(0); const [rate, setRate] = useState(5); const [statuses, setStatuses] = useState<Record<string, string>>({});
-  const [messages, setMessages] = useState<Record<string, string>>({}); const [verdict, setVerdict] = useState<{ decision: string; text: string } | null>(null); const [quote, setQuote] = useState<string | null>(null);
-  useEffect(() => { getCompany(ticker).then(setCompany); }, [ticker]);
-  const refresh = useCallback(() => { calculate(ticker, drop, rate).then(setResult); }, [ticker, drop, rate]);
-  useEffect(() => { const timer = setTimeout(refresh, 250); return () => clearTimeout(timer); }, [refresh]);
-  const run = async () => { setStatuses({}); setMessages({}); setVerdict(null); const { run_id } = await createRun(ticker, drop, rate); const source = new EventSource(`${API}/api/runs/${run_id}/stream`);
-    agents.forEach((agent) => source.addEventListener("agent_started", (event) => { const data = JSON.parse((event as MessageEvent).data); if (data.agent === agent) setStatuses((s) => ({ ...s, [agent]: "running" })); }));
-    source.addEventListener("agent_done", (event) => { const data = JSON.parse((event as MessageEvent).data); setStatuses((s) => ({ ...s, [data.agent]: "done" })); setMessages((m) => ({ ...m, [data.agent]: data.text })); });
-    source.addEventListener("verdict", (event) => { setVerdict(JSON.parse((event as MessageEvent).data)); source.close(); });
+  const { ticker } = use(params);
+  const router = useRouter();
+  const [company, setCompany] = useState<Company | null>(null);
+  const [result, setResult] = useState<CalcResult | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [drop, setDrop] = useState(0);
+  const [rate, setRate] = useState<number | null>(null);
+  const [agentStates, setAgentStates] = useState<Partial<Record<Agent, AgentState>>>({});
+  const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [runError, setRunError] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
+  const [ranWith, setRanWith] = useState<Scenario | null>(null);
+  const [openRule, setOpenRule] = useState<Rule | null>(null);
+  const closeStream = useRef<(() => void) | null>(null);
+
+  // Load the company, and start the refi slider at its current rate so the baseline matches reported numbers.
+  useEffect(() => {
+    getCompany(ticker).then((data) => {
+      setCompany(data);
+      const currentRate = (data.facts.interest / data.facts.total_debt) * 100;
+      setRate(Math.min(15, Math.max(0.5, Math.round(currentRate * 10) / 10)));
+    }).catch((error: Error) => setLoadError(error.message));
+    return () => closeStream.current?.();
+  }, [ticker]);
+
+  // Recalculate when a slider moves. No LLM involved, so this is instant.
+  useEffect(() => {
+    if (rate === null) return;
+    const timer = setTimeout(() => calculate(ticker, drop, rate).then(setResult).catch((error: Error) => setLoadError(error.message)), 100);
+    return () => clearTimeout(timer);
+  }, [ticker, drop, rate]);
+
+  const run = async () => {
+    if (rate === null) return;
+    closeStream.current?.();
+    setAgentStates({}); setVerdict(null); setRunError(null); setRunning(true); setRanWith({ drop, rate });
+    const fail = (message: string) => { setRunError(message); setRunning(false); };
+    try {
+      const { run_id } = await createRun(ticker, drop, rate);
+      closeStream.current = streamRun(run_id, {
+        onAgentStarted: (agent) => setAgentStates((s) => ({ ...s, [agent]: { status: "running" } })),
+        onAgentDone: (agent, text, sources) => setAgentStates((s) => ({ ...s, [agent]: { status: "done", text, sources } })),
+        onVerdict: (data) => { setVerdict(data); setRunning(false); },
+        onError: fail,
+      });
+    } catch (error) {
+      fail((error as Error).message);
+    }
   };
-  if (!company || !result) return <main className="p-10 text-slate-300">Loading committee workspace…</main>;
-  return <main className="mx-auto max-w-7xl px-6 py-8"><header className="mb-8 flex items-start justify-between"><div><button onClick={() => router.push("/")} className="mb-4 text-sm text-cyan-300">← New borrower</button><h1 className="text-4xl font-black">{company.name} <span className="text-lg font-normal text-slate-400">({company.ticker})</span></h1><p className="mt-2 text-sm text-amber-300">Fictional demo company · FY {company.fiscal_year}</p></div><Button onClick={run}>Re-run committee</Button></header>
-    <Card className="mb-6"><div className="grid gap-3 md:grid-cols-5">{agents.map((agent) => <div key={agent} className="rounded-xl border border-slate-700 p-4"><div className="flex justify-between"><span className="text-sm font-semibold">{labels[agent]}</span><span className={`text-xs ${statuses[agent] === "done" ? "text-emerald-300" : statuses[agent] === "running" ? "text-cyan-300" : "text-slate-500"}`}>{statuses[agent] ?? "waiting"}</span></div><p className="mt-3 min-h-12 text-xs leading-5 text-slate-400">{messages[agent] ?? "Awaiting turn…"}</p></div>)}</div></Card>
-    <div className="mb-6 grid gap-4 md:grid-cols-5">{[["Cash", money(company.facts.cash)],["Total debt", money(company.facts.total_debt)],["FCF", money(result.fcf)],["Leverage", ratio(result.leverage)],["Coverage", ratio(result.coverage)]].map(([name, value]) => <Card key={name}><p className="text-sm text-slate-400">{name}</p><p className="mt-2 text-2xl font-black">{value}</p></Card>)}</div>
-    <div className="grid gap-6 lg:grid-cols-3"><Card className="lg:col-span-2"><h2 className="mb-5 text-lg font-bold">Maturity wall</h2><ResponsiveContainer width="100%" height={260}><ComposedChart data={result.wall}><CartesianGrid stroke="#1c3049" /><XAxis dataKey="year" stroke="#91a1b8" /><YAxis tickFormatter={(v) => `$${v / 1e6}M`} stroke="#91a1b8" /><Tooltip formatter={(v: number) => money(v)} /><Bar dataKey="debt_due" fill="#f87171" name="Debt due" /><Line dataKey="cash_available" stroke="#22d3ee" strokeWidth={3} name="Cash available" /></ComposedChart></ResponsiveContainer></Card>
-      <Card><h2 className="mb-5 text-lg font-bold">What-if controls</h2><label className="mb-2 block text-sm text-slate-300">Earnings decline <b className="float-right text-cyan-300">{drop}%</b></label><input className="mb-8 w-full accent-cyan-300" type="range" min="0" max="60" value={drop} onChange={(e) => setDrop(+e.target.value)} /><label className="mb-2 block text-sm text-slate-300">Refinancing rate <b className="float-right text-cyan-300">{rate}%</b></label><input className="w-full accent-cyan-300" type="range" min="0" max="15" step="0.5" value={rate} onChange={(e) => setRate(+e.target.value)} /></Card></div>
-    <div className="mt-6 grid gap-6 lg:grid-cols-2"><Card><h2 className="mb-4 text-lg font-bold">Loan rules</h2>{company.rules.map((rule, i) => { const check = result.rule_checks[i]; return <button key={rule.type} onClick={() => setQuote(rule.quote)} className="mb-3 flex w-full items-center justify-between rounded-xl border border-slate-700 p-4 text-left hover:border-cyan-300"><span><span className="block font-semibold">{rule.type === "max_leverage" ? "Maximum leverage" : "Minimum coverage"}</span><span className="text-xs text-slate-400">§ {rule.section} · threshold {rule.threshold.toFixed(2)}x</span></span><span className={check.passed ? "text-emerald-300" : "text-red-400"}>{check.passed ? "PASS" : "FAIL"} · {ratio(check.value)}</span></button>; })}</Card><Card><h2 className="mb-4 text-lg font-bold">Committee verdict</h2>{verdict ? <><span className={`inline-block rounded-full px-4 py-2 text-sm font-bold ${verdict.decision === "lend" ? "bg-emerald-400/20 text-emerald-300" : "bg-red-400/20 text-red-300"}`}>{verdict.decision === "lend" ? "LEND" : "DON’T LEND"}</span><p className="mt-5 leading-7 text-slate-300">{verdict.text}</p></> : <p className="text-slate-400">Run the committee to see the debate and final decision.</p>}</Card></div>
-    {quote && <div className="fixed inset-0 flex items-center justify-center bg-slate-950/80 p-6" onClick={() => setQuote(null)}><div className="panel max-w-lg p-7" onClick={(e) => e.stopPropagation()}><p className="mb-3 text-sm font-bold text-cyan-300">Credit agreement quote</p><p className="text-lg leading-8">“{quote}”</p><button onClick={() => setQuote(null)} className="mt-6 text-sm text-slate-400">Close</button></div></div>}</main>;
+
+  if (loadError) return <main className="p-10"><p className="text-red-300">{loadError}</p><button onClick={() => router.push("/")} className="mt-4 text-sm text-cyan-300">← Try another ticker</button></main>;
+  if (!company || !result || rate === null) return <main className="p-10 text-slate-300">Loading committee workspace…</main>;
+
+  const stale = ranWith !== null && (ranWith.drop !== drop || ranWith.rate !== rate);
+  return (
+    <main className="mx-auto max-w-7xl space-y-6 px-6 py-8">
+      <header className="flex items-start justify-between">
+        <div>
+          <button onClick={() => router.push("/")} className="mb-4 text-sm text-cyan-300">← New borrower</button>
+          <h1 className="text-4xl font-black">{company.name} <span className="text-lg font-normal text-slate-400">({company.ticker})</span></h1>
+          <p className="mt-2 text-sm text-slate-400">{company.fictional && <span className="text-amber-300">Fictional demo company · </span>}FY {company.fiscal_year}</p>
+        </div>
+        <Button onClick={run} disabled={running}>{running ? "Committee in session…" : ranWith ? "Re-run committee" : "Run committee"}</Button>
+      </header>
+
+      <Card>
+        <div className="grid gap-3 md:grid-cols-5">
+          {agents.map((agent) => {
+            const state = agentStates[agent] ?? { status: "waiting" };
+            return (
+              <div key={agent} className="rounded-xl border border-slate-700 p-4">
+                <div className="flex justify-between">
+                  <span className="text-sm font-semibold">{labels[agent]}</span>
+                  <span className={`text-xs ${state.status === "done" ? "text-emerald-300" : state.status === "running" ? "text-cyan-300" : "text-slate-500"}`}>{state.status}</span>
+                </div>
+                <p className="mt-3 min-h-12 text-xs leading-5 text-slate-400">{state.text ?? "Awaiting turn…"}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      <KpiCards company={company} result={result} />
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <h2 className="mb-5 text-lg font-bold">Maturity wall</h2>
+          <ResponsiveContainer width="100%" height={260}>
+            <ComposedChart data={result.wall}>
+              <CartesianGrid stroke="#1c3049" />
+              <XAxis dataKey="year" stroke="#91a1b8" />
+              <YAxis tickFormatter={(v) => `$${v / 1e6}M`} stroke="#91a1b8" />
+              <Tooltip formatter={(v: number) => money(v)} />
+              <Bar dataKey="debt_due" fill="#f87171" name="Debt due" />
+              <Line dataKey="cash_available" stroke="#22d3ee" strokeWidth={3} name="Cash available" />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </Card>
+        <Sliders drop={drop} rate={rate} onDrop={setDrop} onRate={setRate} />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RulesPanel rules={company.rules} checks={result.rule_checks} onSelect={setOpenRule} />
+        <VerdictCard verdict={verdict} stale={stale} error={runError} />
+      </div>
+
+      <SourceDrawer rule={openRule} onClose={() => setOpenRule(null)} />
+    </main>
+  );
 }
