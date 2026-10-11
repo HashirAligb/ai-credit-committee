@@ -1,0 +1,1 @@
+{"ebitda":100000000,"interest":20000000,"fcf":50000000,"leverage":4,"coverage":5,"rule_checks":[{"type":"max_leverage","value":4,"threshold":5,"passed":true},{"type":"min_coverage","value":5,"threshold":2,"passed":true}],"wall":[{"year":2028,"debt_due":400000000,"cash_available":150000000}]}

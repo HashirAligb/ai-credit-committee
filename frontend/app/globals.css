@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --navy: #071426; --muted: #91a1b8; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--navy); color: #f7fafc; font-family: Arial, sans-serif; }
+button, input { font: inherit; }
+.panel { border: 1px solid #1c3049; background: #0d2037; border-radius: 16px; }
