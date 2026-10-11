@@ -1,8 +1,13 @@
 # AI Credit Committee
 
-A fake-data demo where a credit committee evaluates Pizza Co. (`PZCO`). The backend
-calculates covenant stress locally and streams canned analyst decisions; the Next.js
-frontend presents the dashboard.
+AI agents act as a credit fund's committee and decide whether to lend to a company. The demo
+borrower is Pizza Co. (`PZCO`), which is fictional. The backend does the covenant math locally,
+then a LangGraph pipeline of Gemini agents (two analysts, a Bull, a Bear and a Chair) debates and
+streams its verdict to the Next.js dashboard.
+
+Copy `.env.example` to `.env` and set `GEMINI_API_KEY`. With `DEMO_MODE=1` the backend replays the
+saved runs in `data/demo_runs/` instead of calling Gemini; it also falls back to them if a Gemini
+call fails.
 
 ## Run locally
 

@@ -1,8 +1,14 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agents.routes import router as agents_router
 from app.numbers.routes import router as numbers_router
+
+# Keys and DEMO_MODE live in the repo-root .env. Real environment variables win over the file.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 app = FastAPI(title="AI Credit Committee API")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"],
