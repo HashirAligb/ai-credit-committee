@@ -34,7 +34,7 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
     getCompany(ticker).then((data) => {
       setCompany(data);
       const currentRate = (data.facts.interest / data.facts.total_debt) * 100;
-      setRate(Math.min(15, Math.max(0.5, Math.round(currentRate * 10) / 10)));
+      setRate(Math.min(15, Math.max(0.5, Math.round(currentRate * 100) / 100)));
     }).catch((error: Error) => setLoadError(error.message));
     return () => closeStream.current?.();
   }, [ticker]);
@@ -74,7 +74,8 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
         <div>
           <button onClick={() => router.push("/")} className="mb-4 text-sm text-cyan-300">← New borrower</button>
           <h1 className="text-4xl font-black">{company.name} <span className="text-lg font-normal text-slate-400">({company.ticker})</span></h1>
-          <p className="mt-2 text-sm text-slate-400">{company.fictional && <span className="text-amber-300">Fictional demo company · </span>}FY {company.fiscal_year}</p>
+          <p className="mt-2 text-sm text-slate-400">{company.fictional && <span className="text-amber-300">Fictional example company · </span>}FY {company.fiscal_year}</p>
+          {company.caption && <p className="mt-1 max-w-2xl text-xs text-slate-500">{company.caption}</p>}
         </div>
         <Button onClick={run} disabled={running}>{running ? "Committee in session…" : ranWith ? "Re-run committee" : "Run committee"}</Button>
       </header>
