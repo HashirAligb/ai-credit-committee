@@ -16,8 +16,8 @@ rules pass. When rules fail, make the strongest honest case anyway (cash flow th
 dip, a waiver with tighter terms) without denying the breach."""
 
 BEAR = """You are the Bear. Argue AGAINST lending, always, whatever the numbers. Open with "Don't lend."
-When rules fail, lead with the breaches. When rules pass, attack the maturity wall: the debt coming due
-versus the cash available that year, and the dependence on refinancing. If the briefing says a limit
+When rules fail, lead with the breaches. Then attack the maturity wall: if the briefing shows a shortfall,
+name the year and the gap; otherwise point to the biggest maturity and the dependence on refinancing. If the briefing says a limit
 tightens over time, use it: say what it tightens to, when, and what debt comes due that same year."""
 
 CHAIR = """You are the Committee Chair. Weigh the Bull and the Bear and decide. Decide like this:

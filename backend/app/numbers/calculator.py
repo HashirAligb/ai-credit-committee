@@ -23,8 +23,9 @@ def calculate(company: Company, earnings_drop_pct: float, refi_rate_pct: float) 
             passed = value is not None and value <= rule.threshold
         checks.append(RuleCheck(type=rule.type, value=value, threshold=rule.threshold, passed=passed))
 
-    # One point per year from next fiscal year through the last maturity, so the
-    # chart has no gaps. Cash builds by one year of stressed FCF each year.
+    # Running liquidity, one point per year from next fiscal year through the last maturity.
+    # A borrower in breach of a loan rule can't draw its revolver, so it only counts when all rules pass.
+    revolver_available = all(check.passed for check in checks)
     first_year = company.fiscal_year + 1
     due_by_year: dict[int, float] = {}
     for maturity in company.maturities:
@@ -37,11 +38,17 @@ def calculate(company: Company, earnings_drop_pct: float, refi_rate_pct: float) 
     if thereafter:
         due_by_year[last_year + 1] = thereafter
         labels[last_year + 1] = f"{last_year + 1}+"
+    liquidity = facts.cash + (facts.revolver if revolver_available else 0)
     wall: list[WallPoint] = []
     for year, label in labels.items():
-        years_out = year - company.fiscal_year
-        cash_available = facts.cash + stressed_fcf * years_out + facts.revolver
-        wall.append(WallPoint(year=year, label=label, debt_due=due_by_year.get(year, 0), cash_available=cash_available))
+        debt_due = due_by_year.get(year, 0)
+        # Add the year's FCF, then repay the year's debt from what is there (no refinancing).
+        # Liquidity can't go below zero: once it runs out, every unpaid dollar is a shortfall.
+        before_repayment = max(0, liquidity + stressed_fcf)
+        shortfall = max(0, debt_due - before_repayment)
+        wall.append(WallPoint(year=year, label=label, debt_due=debt_due, cash_available=before_repayment, shortfall=shortfall))
+        liquidity = max(0, before_repayment - debt_due)
 
     return CalcResult(ebitda=stressed_ebitda, interest=stressed_interest, fcf=stressed_fcf,
-                      leverage=leverage, net_leverage=net_leverage, coverage=coverage, rule_checks=checks, wall=wall)
+                      leverage=leverage, net_leverage=net_leverage, coverage=coverage,
+                      revolver_available=revolver_available, rule_checks=checks, wall=wall)

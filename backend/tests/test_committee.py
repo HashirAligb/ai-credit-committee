@@ -73,6 +73,16 @@ def test_silgan_briefing_uses_net_leverage_and_the_step_down():
     assert "2028 is also the year $1.38B of debt comes due" in briefing
     assert "2031+: $710M of debt due" in briefing
     assert "Free cash flow per year: -$99M" in briefing
+    assert "Revolver unavailable: covenant breach" in briefing
+    assert "First shortfall: 2028, when $1.38B comes due against $0M of liquidity, a gap of $1.38B" in briefing
+
+
+def test_silgan_baseline_briefing_reports_no_shortfall():
+    silgan = load_company("SLGN")
+    rate = silgan.facts.interest / silgan.facts.total_debt * 100
+    briefing = build_briefing(silgan, calculate(silgan, 0, rate), 0, rate)
+    assert "No shortfall: liquidity covers the debt due in every year." in briefing
+    assert "The $1.48B undrawn revolver is counted in liquidity." in briefing
 
 
 # ---- Reading the real contract (no network: a small fake document) ----

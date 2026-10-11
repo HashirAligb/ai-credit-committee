@@ -62,7 +62,8 @@ class WallPoint(BaseModel):
     year: int
     label: str  # what the chart shows: "2028", or "2031+" for the thereafter bucket
     debt_due: float
-    cash_available: float
+    cash_available: float  # liquidity before this year's repayment
+    shortfall: float  # debt due minus liquidity, 0 if the year is covered
 
 
 class CalcResult(BaseModel):
@@ -72,5 +73,6 @@ class CalcResult(BaseModel):
     leverage: float | None
     net_leverage: float | None
     coverage: float
+    revolver_available: bool  # False when a loan rule fails: a borrower in breach can't draw it
     rule_checks: list[RuleCheck]
     wall: list[WallPoint]

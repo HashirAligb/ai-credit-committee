@@ -21,7 +21,9 @@ export type RuleCheck = { type: string; value: number | null; threshold: number;
 export type CalcResult = {
   ebitda: number; interest: number; fcf: number; leverage: number | null; net_leverage: number | null; coverage: number;
   rule_checks: RuleCheck[];
-  wall: { year: number; label: string; debt_due: number; cash_available: number }[]; // label is "2028" or "2031+"
+  revolver_available: boolean; // false when a loan rule fails
+  // label is "2028" or "2031+". cash_available = liquidity before that year's repayment.
+  wall: { year: number; label: string; debt_due: number; cash_available: number; shortfall: number }[];
 };
 
 export type Agent = "financial_analyst" | "contract_analyst" | "bull" | "bear" | "chair";

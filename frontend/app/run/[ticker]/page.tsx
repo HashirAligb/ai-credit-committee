@@ -89,7 +89,7 @@ export default function RunPage({ params }: { params: Promise<{ ticker: string }
       <KpiCards company={company} result={result} />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <MaturityWall wall={result.wall} />
+        <MaturityWall wall={result.wall} revolverAvailable={result.revolver_available} hasRevolver={company.facts.revolver > 0} />
         <Sliders drop={drop} rate={rate} onDrop={setDrop} onRate={setRate} />
       </div>
 

@@ -56,10 +56,21 @@ def build_briefing(company: Company, calc: CalcResult, earnings_drop_pct: float,
                 + (f" {last.year} is also the year {money(due)} of debt comes due." if due else "")
             )
     wall_lines = [
-        f"- {point.label}: {money(point.debt_due)} of debt due, {money(point.cash_available)} of cash available"
-        + (f" (short by {money(point.debt_due - point.cash_available)}, must be refinanced)" if point.debt_due > point.cash_available else "")
+        f"- {point.label}: {money(point.debt_due)} of debt due, {money(point.cash_available)} of liquidity before repaying it"
+        + (f". SHORTFALL of {money(point.shortfall)}" if point.shortfall > 0 else "")
         for point in calc.wall
     ]
+    short = [point for point in calc.wall if point.shortfall > 0]
+    if short:
+        first = short[0]
+        shortfall_line = (f"First shortfall: {first.label}, when {money(first.debt_due)} comes due against "
+                          f"{money(first.cash_available)} of liquidity, a gap of {money(first.shortfall)} that must be refinanced.")
+    else:
+        shortfall_line = "No shortfall: liquidity covers the debt due in every year."
+    if calc.revolver_available:
+        revolver_line = f"The {money(facts.revolver)} undrawn revolver is counted in liquidity."
+    else:
+        revolver_line = f"Revolver unavailable: covenant breach. The {money(facts.revolver)} revolver is NOT counted, because a borrower in breach can't draw it."
     sources = ["10-K income statement", "10-K cash flow statement", "10-K balance sheet", "10-K debt footnote",
                "What-if calculator", "Maturity wall"] + [f"Credit agreement §{rule.section}" for rule in company.rules]
     failed = sum(not check.passed for check in calc.rule_checks)
@@ -91,8 +102,10 @@ Numbers in this scenario (from the what-if calculator, these are the ones to jud
 Loan rules (covenants): {failed} of {len(calc.rule_checks)} FAIL in this scenario.
 {chr(10).join(rule_lines)}
 
-Maturity wall (cash available = cash + cumulative free cash flow + revolver):
+Maturity wall (liquidity = cash + revolver, plus each year's free cash flow, minus debt already repaid; no refinancing assumed):
+{revolver_line}
 {chr(10).join(wall_lines)}
+{shortfall_line}
 
 Allowed source labels:
 {chr(10).join('- ' + label for label in sources)}"""
