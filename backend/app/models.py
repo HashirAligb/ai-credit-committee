@@ -38,7 +38,7 @@ class Company(BaseModel):
 class CalcRequest(BaseModel):
     ticker: str
     earnings_drop_pct: float = Field(ge=0, le=60)
-    refi_rate_pct: float = Field(ge=0, le=15)
+    refi_rate_pct: float = Field(gt=0, le=15)  # 0% would make coverage infinite
 
 
 class RuleCheck(BaseModel):

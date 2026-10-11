@@ -11,7 +11,7 @@ def calculate(company: Company, earnings_drop_pct: float, refi_rate_pct: float) 
     stressed_interest = facts.total_debt * refi_rate_pct / 100
     stressed_fcf = fcf - ebitda * drop - (stressed_interest - interest)
     leverage = facts.total_debt / stressed_ebitda if stressed_ebitda > 0 else None
-    coverage = stressed_ebitda / stressed_interest if stressed_interest > 0 else float("inf")
+    coverage = stressed_ebitda / stressed_interest
 
     checks: list[RuleCheck] = []
     for rule in company.rules:
